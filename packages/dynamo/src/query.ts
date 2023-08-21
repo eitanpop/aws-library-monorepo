@@ -1,6 +1,5 @@
 import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall, NativeAttributeValue } from '@aws-sdk/util-dynamodb';
-import logger from '../logger';
 
 // create a fluent API interface for dyanamo queries.
 interface IQueryObject {
@@ -16,7 +15,7 @@ interface IQueryObject {
 const addParameterToQueryCommandInput = (
   queryCommandInput: QueryCommandInput,
   name: keyof QueryCommandInput,
-  value: typeof queryCommandInput[keyof QueryCommandInput],
+  value: (typeof queryCommandInput)[keyof QueryCommandInput],
 ): QueryCommandInput => {
   return {
     ...queryCommandInput,
@@ -55,7 +54,6 @@ const getQueryObjectWithOptions = (region: string) => {
         ),
 
       debug: () => {
-        logger.info('QueryCommandInput', input);
         return getQueryObject(input);
       },
 

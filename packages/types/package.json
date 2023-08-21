@@ -1,21 +1,16 @@
 {
-  "name": "@claritycare/core",
+  "name": "@aws-lib/types",
   "version": "1.0.0",
-  "description": "Core library for Clarity Care",
+  "description": "Type library for AWS",
   "author": "",
-  "homepage": "https://github.com/Clarity-Care/clarity-monorepo-backend#readme",
   "license": "ISC",
   "main": "./dist/index.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Clarity-Care/clarity-monorepo-backend.git"
-  },
   "scripts": {
     "build": "tsc --build",
     "lint": "eslint"
   },
   "dependencies": {
-    "@claritycare/types": "^1.0.0",
+    "@aws-lib/types": "^1.0.0",
     "@aws-sdk/client-timestream-write": "3.209.0",
     "@aws-sdk/client-timestream-query": "3.370.0",
     "@aws-sdk/client-dynamodb": "3.238.0",

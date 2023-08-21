@@ -6,7 +6,6 @@ import {
   UpdateItemCommandInput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, NativeAttributeValue } from '@aws-sdk/util-dynamodb';
-import logger from '../logger';
 
 const getDynamoDbUpdateInputs = (item: Record<string, NativeAttributeValue>) => {
   let UpdateExpression = 'set ';
@@ -61,8 +60,6 @@ export const update = (
     ExpressionAttributeNames,
     ExpressionAttributeValues,
   };
-
-  logger.info('update input', input);
 
   return client.send(new UpdateItemCommand(input));
 };

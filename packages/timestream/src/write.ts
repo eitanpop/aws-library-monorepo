@@ -6,8 +6,7 @@ import {
   RejectedRecordsException,
   RejectedRecord,
 } from '@aws-sdk/client-timestream-write';
-import { IRecord } from '@claritycare/types';
-import logger from '../logger';
+import { IRecord } from '@aws-lib/types';
 
 const writeClient = new TimestreamWriteClient({ region: 'us-east-1' });
 
@@ -15,15 +14,14 @@ const send = async (command: WriteRecordsCommand) => {
   try {
     return await writeClient.send(command);
   } catch (error: unknown) {
-    logger.info('error', JSON.stringify(error));
     if (error instanceof RejectedRecordsException && error.RejectedRecords?.length) {
-      logger.error(
-        `(${command.input.Records?.length}) Error record(s):`,
-        error?.RejectedRecords?.map((rejectedRecord: RejectedRecord) => {
-          if (rejectedRecord.RecordIndex && command.input.Records)
-            return command.input.Records[rejectedRecord.RecordIndex];
-          return null;
-        }),
+      throw Error(
+        `(${command.input.Records?.length}) Error record(s): ` +
+          error?.RejectedRecords?.map((rejectedRecord: RejectedRecord) => {
+            if (rejectedRecord.RecordIndex && command.input.Records)
+              return command.input.Records[rejectedRecord.RecordIndex];
+            return null;
+          }),
       );
     }
     return null;
@@ -38,7 +36,6 @@ const batchWrite = async (params: WriteRecordsRequest, batchSize = 100) => {
 
   for (let i = 0; i < records.length; i += batchSize) {
     const newParams = { ...params, Records: records.slice(i, i + batchSize) };
-    logger.info(`writing chunk: ${i} - ${i + newParams.Records.length}`, newParams.Records);
     const command = new WriteRecordsCommand(newParams);
     writes.push(send(command));
   }
@@ -49,7 +46,6 @@ const batchWrite = async (params: WriteRecordsRequest, batchSize = 100) => {
 const getWriteClient = (databaseName: string, tableName: string) => ({
   write: async (commonDimensions: Dimension[], records: IRecord[]) => {
     if (!records.length) {
-      logger.info('no records to write');
       return [];
     }
     const params: WriteRecordsRequest = {
@@ -64,7 +60,6 @@ const getWriteClient = (databaseName: string, tableName: string) => ({
       })),
       CommonAttributes: { Dimensions: commonDimensions },
     };
-    logger.info('writing', JSON.stringify(params));
 
     return batchWrite(params);
   },
